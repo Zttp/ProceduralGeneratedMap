@@ -301,9 +301,6 @@ Players.OnPlayerConnected.Add(player => {
         chunkManager.playerChunks[player.id] = null;
         chunkManager.updatePlayerChunks();
 
-        // Даем инструменты
-        player.Inventory.Add(1, 1); // Даем блоки
-        player.Inventory.Add(2, 1); // Даем кирку
 
     } catch (e) {
         console.error("Ошибка при подключении игрока:", e);
@@ -324,12 +321,6 @@ function initializeGameMode() {
         if (!setupTimers()) {
             throw new Error("Не удалось настроить таймеры");
         }
-        
-        // Устанавливаем свойства режима
-        GameMode.Team = true;
-        GameMode.FriendlyFire = false;
-        GameMode.Build = true;
-        GameMode.Damage = true;
         
         Chat.BroadcastMessage("Режим успешно загружен!");
         return true;
