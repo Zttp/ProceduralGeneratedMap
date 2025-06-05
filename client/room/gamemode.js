@@ -1,12 +1,10 @@
-//Режим сделал "qupe"
+// Режим сделал "qupe"
 
 import { DisplayValueHeader, Color, Vector3, Index } from 'pixel_combats/basic';
 import { Game, Map, MapEditor, Players, Inventory, LeaderBoard, BuildBlocksSet, Teams, Damage, BreackGraph, Ui, Properties, GameMode, Spawns, Timers, TeamsBalancer, Build, AreaService, AreaPlayerTriggerService, AreaViewService, Chat } from 'pixel_combats/room';
 
-
-
-// Создаем команды игроков
-Teams.Add('PlayersTeam', 'ИГРОКИ', new Color(0.5, 0.5, 0.5, 1));
+// Создаем команду игроков и сохраняем в переменную
+const PlayersTeam = Teams.Add('Players', 'ИГРОКИ', new Color(0.5, 0.5, 0.5, 1));
 PlayersTeam.Spawns.SpawnPointsGroups.Add(1);
 PlayersTeam.Build.BlocksSet.Value = BuildBlocksSet.Blue;
 
@@ -88,7 +86,7 @@ let ChunkManager = {
         const propName = `chunk_${key}`;
         
         // Пытаемся загрузить из сохранения
-        if (Properties.Has(propName) {
+        if (Properties.Has(propName)) {
             const base64 = Properties.Get(propName).Value;
             const binary = atob(base64);
             const bytes = new Uint8Array(binary.length);
@@ -139,7 +137,9 @@ let ChunkManager = {
     processLoadQueue() {
         for (let i = 0; i < MAX_CHUNKS_PER_FRAME && this.loadQueue.length > 0; i++) {
             const { cx, cy, cz } = this.loadQueue.shift();
-            const chunk = this.cache[this.getChunkKey(cx, cy, cz)];
+            const key = this.getChunkKey(cx, cy, cz);
+            const chunk = this.cache[key];
+            if (!chunk) continue;
             
             // Устанавливаем блоки в мире
             for (let x = 0; x < CHUNK_SIZE; x++) {
@@ -253,7 +253,7 @@ MapEditor.SetBlock = (x, y, z, blockId) => {
 };
 
 // Таймер для управления чанками
-const ChunkTimer = Timers.GetContext().Get('ChunkManager');
+const ChunkTimer = Timers.CreateTimer('ChunkManager');
 ChunkTimer.OnTimer.Add(() => {
     ChunkManager.updatePlayerChunks();
     ChunkManager.checkUnload();
@@ -263,27 +263,25 @@ ChunkTimer.OnTimer.Add(() => {
 ChunkTimer.RestartLoop(1);
 
 // Автосохранение измененных чанков каждые 30 секунд
-Timers.GetContext().Get('ChunkSaver').OnTimer.Add(() => {
+const ChunkSaverTimer = Timers.CreateTimer('ChunkSaver');
+ChunkSaverTimer.OnTimer.Add(() => {
     ChunkManager.dirtyChunks.forEach(key => {
         const [cx, cy, cz] = key.split(',').map(Number);
         ChunkManager.saveChunk(cx, cy, cz);
     });
     ChunkManager.dirtyChunks.clear();
 });
-Timers.GetContext().Get('ChunkSaver').RestartLoop(30);
+ChunkSaverTimer.RestartLoop(30);
 
 // Инициализация игрока
 Players.OnPlayerConnected.Add(function(p) {
-    PlayersTeam.Add(player);
-    player.Spawns.Spawn();
+    PlayersTeam.Add(p);
+    p.Spawns.Spawn();
     p.Ui.Hint.Value = 'Загрузка чанков...';
+    ChunkManager.playerChunks[p.id] = null; // Инициализируем запись для игрока
     ChunkManager.updatePlayerChunks();
 });
 
 Players.OnPlayerDisconnected.Add(function(p) {
-    ChunkManager.dirtyChunks.forEach(key => {
-        const [cx, cy, cz] = key.split(',').map(Number);
-        ChunkManager.saveChunk(cx, cy, cz);
-    });
-    ChunkManager.dirtyChunks.clear();
+    delete ChunkManager.playerChunks[p.id];
 });
