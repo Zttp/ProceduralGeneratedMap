@@ -1,0 +1,12 @@
+{
+    "Name": "ProceduralGenerationMap",
+    "Description": "Режим процедурно генерирующий бесконечную карту по чанкам и также запоминающий их",
+    "StartClientVersion": 334,
+    "ApiVersion": 2,
+    "MapLists": [
+      {
+        "MapListId": 8401,
+        "Name": "Заготовки"
+      }
+    ]
+}
