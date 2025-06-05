@@ -1,6 +1,6 @@
 {
-    "Name": "ProceduralGenerationMap",
-    "Description": "Режим процедурно генерирующий бесконечную карту по чанкам и также запоминающий их",
+    "Name": "ProceduralGeneratedMap",
+    "Description": "Процедурно генерируемая карта. Этот режим генерирует бесконечную карту по чанкам и запоминает их",
     "StartClientVersion": 334,
     "ApiVersion": 2,
     "MapLists": [
@@ -8,5 +8,19 @@
         "MapListId": 23177,
         "Name": "Карты для режима"
       }
-    ]
+    ],
+    "Parameters": {
+      "Bool": [
+        {
+          "Name": "RedTeam",
+          "DisplayName": "Режим сделал awheko",
+          "Default": true
+        },
+        {
+          "Name": "BlueTeam",
+          "DisplayName": "Используйте только карты для режима",
+          "Default": true
+        }
+      ]
+    }
 }
