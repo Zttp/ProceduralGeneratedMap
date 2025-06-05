@@ -6,7 +6,7 @@ import { Game, Map, MapEditor, Players, Inventory, LeaderBoard, BuildBlocksSet, 
 
 
 // Создаем команды игроков
-Teams.Add('Players', 'ИГРОКИ', new Color(0.5, 0.5, 0.5, 1));
+Teams.Add('PlayersTeam', 'ИГРОКИ', new Color(0.5, 0.5, 0.5, 1));
 PlayersTeam.Spawns.SpawnPointsGroups.Add(1);
 PlayersTeam.Build.BlocksSet.Value = BuildBlocksSet.Blue;
 
